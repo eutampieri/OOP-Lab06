@@ -43,10 +43,10 @@ public final class TestSocialNetworkUser {
          * 
          * * Adam Smith, asmith, (no age)
          */
-        final SocialNetworkUser<UserImpl> kbacon = new SocialNetworkUserImpl<UserImpl>("Kevin", "Bacon", "kbacon", 56);
-        final SocialNetworkUser<UserImpl> dwashington = new SocialNetworkUserImpl<UserImpl>("Denzel", "Washington", "dwashington", 59);
-        final SocialNetworkUser<UserImpl> mgladwell = new SocialNetworkUserImpl<UserImpl>("Malcom", "Gladwell", "mgladwell", 51);
-        final SocialNetworkUser<UserImpl> ntaleb = new SocialNetworkUserImpl<UserImpl>("Nicholas", "Taleb", "ntaleb", 54);
+        final SocialNetworkUser<User> kbacon = new SocialNetworkUserImpl<>("Kevin", "Bacon", "kbacon", 56);
+        final SocialNetworkUser<User> dwashington = new SocialNetworkUserImpl<>("Denzel", "Washington", "dwashington", 59);
+        final SocialNetworkUser<User> mgladwell = new SocialNetworkUserImpl<>("Malcom", "Gladwell", "mgladwell", 51);
+        final SocialNetworkUser<User> ntaleb = new SocialNetworkUserImpl<>("Nicholas", "Taleb", "ntaleb", 54);
         final User asmith = new UserImpl("Adam", "Smith", "asmith");
         /*
          * Make people follow each other
@@ -60,11 +60,11 @@ public final class TestSocialNetworkUser {
          * All tests must return true
          */
         System.out.println("Smith has not set any age at all: " + (!asmith.isAgeDefined()));
-        final Collection<UserImpl> kbaconFriends = kbacon.getFollowedUsersInGroup("Malcom");
+        final Collection<User> kbaconFriends = kbacon.getFollowedUsersInGroup("Malcom");
         System.out.println("K Bacon must have no followed people called Malcom: " + kbaconFriends.isEmpty());
-        final Collection<UserImpl> mgladFriends = mgladwell.getFollowedUsersInGroup("Close friends");
+        final Collection<User> mgladFriends = mgladwell.getFollowedUsersInGroup("Close friends");
         System.out.println("M Gladwell has not set yet any group called \"Close friends\": " + mgladFriends.isEmpty());
-        final Collection<UserImpl> dwashFriends = dwashington.getFollowedUsersInGroup(WRITERS);
+        final Collection<User> dwashFriends = dwashington.getFollowedUsersInGroup(WRITERS);
         System.out.println("Denzel has 2 followed people in group \"writers\": " + (dwashFriends.size() == 2));
         /*
          * Adding another friend to Denzel's "writers" group...
