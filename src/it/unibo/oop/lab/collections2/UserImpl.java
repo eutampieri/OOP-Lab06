@@ -3,7 +3,7 @@ package it.unibo.oop.lab.collections2;
 /**
  * This is a basic implementation of a {@link it.unibo.oop.lab.collections2.User}.
  * 
- * This class is completely mplemented and can be used as it is.
+ * This class is completely implemented and can be used as it is.
  * 
  */
 public class UserImpl implements User {
@@ -85,7 +85,7 @@ public class UserImpl implements User {
      * {@inheritDoc}
      */
     public boolean isAgeDefined() {
-        return this.age > 0;
+        return this.age > -1;
     }
 
     /**

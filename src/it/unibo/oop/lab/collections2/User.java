@@ -16,9 +16,9 @@ public interface User {
     int getAge();
 
     /**
-     * Returns a user's firstname.
+     * Returns a user's first name.
      * 
-     * @return the firstname of this user
+     * @return the first name of this user
      */
     String getFirstName();
 

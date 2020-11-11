@@ -1,7 +1,13 @@
 package it.unibo.oop.lab.collections2;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -29,6 +35,7 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
      * 
      * think of what type of keys and values would best suit the requirements
      */
+	private Map<String, Set<U>> groups;
 
     /*
      * [CONSTRUCTORS]
@@ -56,6 +63,12 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
      */
     public SocialNetworkUserImpl(final String name, final String surname, final String user, final int userAge) {
         super(name, surname, user, userAge);
+        this.groups = new HashMap<>();
+    }
+    
+    public SocialNetworkUserImpl(final String name, final String surname, final String user) {
+        super(name, surname, user, -1);
+        this.groups = new HashMap<>();
     }
 
     /*
@@ -66,17 +79,31 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
 
     @Override
     public boolean addFollowedUser(final String circle, final U user) {
-        return false;
+        if(!this.groups.containsKey(circle)) {
+        	this.groups.put(circle, new HashSet<>());
+        }
+        if(this.groups.get(circle).contains(user)) {
+        	return false;
+        } else {
+        	this.groups.get(circle).add(user);
+        	return true;
+        }
     }
 
     @Override
     public Collection<U> getFollowedUsersInGroup(final String groupName) {
-        return null;
+        return this.groups.get(groupName) == null ? 
+        		new ArrayList<U>() : 
+        		new HashSet<>(this.groups.get(groupName));
     }
 
     @Override
     public List<U> getFollowedUsers() {
-        return null;
+        return this.groups.values()
+        		.stream()
+        		.flatMap(users -> users.stream())
+        		.distinct()
+        		.collect(Collectors.toList());
     }
 
 }

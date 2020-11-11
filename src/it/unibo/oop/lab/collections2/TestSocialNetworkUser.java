@@ -43,33 +43,33 @@ public final class TestSocialNetworkUser {
          * 
          * * Adam Smith, asmith, (no age)
          */
-        final SocialNetworkUser<User> kbacon = null;
-        final SocialNetworkUser<User> dwashington = null;
-        final SocialNetworkUser<User> mgladwell = null;
-        final SocialNetworkUser<User> ntaleb = null;
+        final SocialNetworkUser<UserImpl> kbacon = new SocialNetworkUserImpl<UserImpl>("Kevin", "Bacon", "kbacon", 56);
+        final SocialNetworkUser<UserImpl> dwashington = new SocialNetworkUserImpl<UserImpl>("Denzel", "Washington", "dwashington", 59);
+        final SocialNetworkUser<UserImpl> mgladwell = new SocialNetworkUserImpl<UserImpl>("Malcom", "Gladwell", "mgladwell", 51);
+        final SocialNetworkUser<UserImpl> ntaleb = new SocialNetworkUserImpl<UserImpl>("Nicholas", "Taleb", "ntaleb", 54);
         final User asmith = new UserImpl("Adam", "Smith", "asmith");
         /*
          * Make people follow each other
          */
-        mgladwell.addFollowedUser("acquaintances", ntaleb);
-        dwashington.addFollowedUser("myths", asmith);
-        dwashington.addFollowedUser(WRITERS, ntaleb);
-        dwashington.addFollowedUser("colleagues", kbacon);
-        dwashington.addFollowedUser(WRITERS, mgladwell);
+        mgladwell.addFollowedUser("acquaintances", (UserImpl) ntaleb);
+        dwashington.addFollowedUser("myths", (UserImpl) asmith);
+        dwashington.addFollowedUser(WRITERS, (UserImpl) ntaleb);
+        dwashington.addFollowedUser("colleagues", (UserImpl) kbacon);
+        dwashington.addFollowedUser(WRITERS, (UserImpl) mgladwell);
         /*
          * All tests must return true
          */
         System.out.println("Smith has not set any age at all: " + (!asmith.isAgeDefined()));
-        final Collection<User> kbaconFriends = kbacon.getFollowedUsersInGroup("Malcom");
+        final Collection<UserImpl> kbaconFriends = kbacon.getFollowedUsersInGroup("Malcom");
         System.out.println("K Bacon must have no followed people called Malcom: " + kbaconFriends.isEmpty());
-        final Collection<User> mgladFriends = mgladwell.getFollowedUsersInGroup("Close friends");
+        final Collection<UserImpl> mgladFriends = mgladwell.getFollowedUsersInGroup("Close friends");
         System.out.println("M Gladwell has not set yet any group called \"Close friends\": " + mgladFriends.isEmpty());
-        final Collection<User> dwashFriends = dwashington.getFollowedUsersInGroup(WRITERS);
+        final Collection<UserImpl> dwashFriends = dwashington.getFollowedUsersInGroup(WRITERS);
         System.out.println("Denzel has 2 followed people in group \"writers\": " + (dwashFriends.size() == 2));
         /*
          * Adding another friend to Denzel's "writers" group...
          */
-        dwashFriends.add(asmith);
+        dwashFriends.add((UserImpl) asmith);
         /*
          * The above operation *MUST* have no effect on Denzel's profile itself:
          * STILL TWO PEOPLE in denzel's group called writers

@@ -28,7 +28,7 @@ public interface SocialNetworkUser<U extends User> extends User {
      * Gets the list of every person followed by this user disregarding the
      * group.
      * 
-     * @return the list of people followed by this user among all her groups
+     * @return the list of people followed by this user among all their groups
      */
     List<U> getFollowedUsers();
 
