@@ -55,10 +55,8 @@ public final class GraphImpl<N> implements Graph<N> {
 
 	public List<N> getPath(N source, N target) {
 		if(source.equals(target)) {
-			System.out.println("Returning!!");
 			return new ArrayList<>(List.of(target));
 		}
-		System.out.println("Getting path from " + source + " to " + target);
 		List<N> optimalPath = this.graph.get(source)
 				.stream()
 				.map(n -> getPath(n, target))
