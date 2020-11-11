@@ -1,6 +1,6 @@
 package it.unibo.oop.lab.exception2;
 
-import com.sun.tools.javac.util.MandatoryWarningHandler;
+//import com.sun.tools.javac.util.MandatoryWarningHandler;
 
 /**
  * Class modeling a BankAccount with strict policies: getting money is allowed
@@ -70,12 +70,14 @@ public class StrictBankAccount implements BankAccount {
      * {@inheritDoc}
      */
     public void depositFromATM(final int usrID, final double amount) throws WrongAccountHolderException, TransactionsOverQuotaException {
-        try {
-            this.deposit(usrID, amount - StrictBankAccount.ATM_TRANSACTION_FEE);
-            increaseATMTransactionsCount();
-        } catch(WrongAccountHolderException|
-        		TransactionsOverQuotaException e) {
-        	throw e;
+    	if (totalTransactionCount < maximumAllowedATMTransactions) {
+    		try {
+    			this.deposit(usrID, amount - StrictBankAccount.ATM_TRANSACTION_FEE);
+    		} catch(WrongAccountHolderException e) {
+    			throw e;
+    		}
+    	} else {
+        	throw new TransactionsOverQuotaException();
         }
     }
 
@@ -87,8 +89,6 @@ public class StrictBankAccount implements BankAccount {
         if (totalTransactionCount < maximumAllowedATMTransactions) {
         	try {
         		this.withdraw(usrID, amount + StrictBankAccount.ATM_TRANSACTION_FEE);
-        		// Why don't we increase the transaction count here?
-        		// It would prevent me from checking the transaction count!
         	} catch(WrongAccountHolderException|
         			NotEnoughFoundsException e) {
         		throw e;
@@ -141,17 +141,10 @@ public class StrictBankAccount implements BankAccount {
     }
 
     private boolean isWithdrawAllowed(final double amount) {
-        return balance > amount;
+        return balance >= amount;
     }
     
     private void increaseTransactionsCount() {
     	totalTransactionCount++;
-    }
-    private void increaseATMTransactionsCount() throws TransactionsOverQuotaException {
-    	if (totalTransactionCount < maximumAllowedATMTransactions) {
-    		this.increaseTransactionsCount();
-    	} else {
-    		throw new TransactionsOverQuotaException();
-    	}
     }
 }
