@@ -1,12 +1,17 @@
 package it.unibo.oop.lab.exception1;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Models a generic Robot.
  * 
  */
 public class Robot {
 
-    private static final int BATTERY_EMPTY = 0;
+	// I commented out the next variable because, as I explained in consumeBatteryForMovement,
+	// I don't think it's a good idea to fully drain the battery!
+    // private static final int BATTERY_EMPTY = 0;
     private static final int MOVEMENT_DELTA = 1;
     private static final double MOVEMENT_DELTA_CONSUMPTION = 0.1;
     private static final double BATTERY_FULL = 100;
@@ -34,8 +39,13 @@ public class Robot {
      * 
      * @return If the Up movement has been performed
      */
-    public boolean moveUp() {
-        return moveToPosition(environment.getCurrPosX(), this.environment.getCurrPosY() + Robot.MOVEMENT_DELTA);
+    public void moveUp() throws PositionOutOfBoundException, NotEnoughBatteryException {
+    	try {
+    		moveToPosition(environment.getCurrPosX(), this.environment.getCurrPosY() + Robot.MOVEMENT_DELTA);
+    	} catch(PositionOutOfBoundException |
+    			NotEnoughBatteryException e) {
+        	throw e;
+        }
     }
 
     /**
@@ -43,8 +53,13 @@ public class Robot {
      * 
      * @return If the Down movement has been performed
      */
-    public boolean moveDown() {
-        return this.moveToPosition(this.environment.getCurrPosX(), environment.getCurrPosY() - Robot.MOVEMENT_DELTA);
+    public void moveDown() throws PositionOutOfBoundException, NotEnoughBatteryException {
+        try {
+        	this.moveToPosition(this.environment.getCurrPosX(), environment.getCurrPosY() - Robot.MOVEMENT_DELTA);
+    	} catch(PositionOutOfBoundException |
+    			NotEnoughBatteryException e) {
+        	throw e;
+        }
     }
 
     /**
@@ -52,9 +67,14 @@ public class Robot {
      * 
      * @return A boolean indicating if the Left movement has been performed
      */
-    public boolean moveLeft() {
-        return this.moveToPosition(this.environment.getCurrPosX() - Robot.MOVEMENT_DELTA,
+    public void moveLeft() throws PositionOutOfBoundException, NotEnoughBatteryException {
+    	try {
+    		this.moveToPosition(this.environment.getCurrPosX() - Robot.MOVEMENT_DELTA,
                 this.environment.getCurrPosY());
+    	} catch(PositionOutOfBoundException |
+    			NotEnoughBatteryException e) {
+        	throw e;
+        }
     }
 
     /**
@@ -62,9 +82,14 @@ public class Robot {
      * 
      * @return A boolean indicating if the Right movement has been performed
      */
-    public boolean moveRight() {
-        return this.moveToPosition(this.environment.getCurrPosX() + Robot.MOVEMENT_DELTA,
+    public void moveRight() throws PositionOutOfBoundException, NotEnoughBatteryException {
+    	try {
+    		this.moveToPosition(this.environment.getCurrPosX() + Robot.MOVEMENT_DELTA,
                 this.environment.getCurrPosY());
+    	} catch(PositionOutOfBoundException |
+    			NotEnoughBatteryException e) {
+        	throw e;
+        }
     }
 
     /**
@@ -83,22 +108,19 @@ public class Robot {
      *            the new Y position to move the robot to
      * @return true if robot gets moved, false otherwise
      */
-    private boolean moveToPosition(final int newX, final int newY) {
-        boolean returnValue = true;
-        if (this.isBatteryEnoughToMove()) {
-            if (this.environment.move(newX, newY)) {
-                this.consumeBatteryForMovement();
-                this.log("Moved to position(" + newX + "," + newY + ").");
-            } else {
-                this.log("Can not move to (" + newX + "," + newY
-                        + ") the robot is touching at least one world boundary");
-                returnValue = false;
-            }
-        } else {
-            this.log("Can not move to position(" + newX + "," + newY + "). Not enough battery.");
-            returnValue = false;
-        }
-        return returnValue;
+    private void moveToPosition(final int newX, final int newY) 
+    		throws PositionOutOfBoundException, NotEnoughBatteryException {
+    	try {
+    		this.consumeBatteryForMovement();
+       		this.environment.move(newX, newY);
+            this.log("Moved to position(" + newX + "," + newY + ").");
+          } catch(NotEnoughBatteryException e) {
+        	  throw e;
+          } catch(PositionOutOfBoundException e) {
+        	  // If we cannot move, then we undo the battery consumption
+        	  this.consumeBattery(-Robot.MOVEMENT_DELTA_CONSUMPTION);
+        	  throw e;
+          }
     }
 
     /**
@@ -108,6 +130,13 @@ public class Robot {
     protected void consumeBatteryForMovement() {
         this.consumeBattery(Robot.MOVEMENT_DELTA_CONSUMPTION);
     }
+    
+    private double getRoundedBatteryValue() {
+    	double digits = Math.log10(MOVEMENT_DELTA_CONSUMPTION) * -1 + 1;
+    	return BigDecimal.valueOf(this.getBatteryLevel())
+    			.setScale((int) digits, RoundingMode.HALF_UP)
+    			.doubleValue();
+    }
 
     /**
      * Consume the amount of energy provided in input from the battery.
@@ -115,20 +144,14 @@ public class Robot {
      * @param amount
      *            the amount of battery energy to consume
      */
-    protected void consumeBattery(final double amount) {
-        if (batteryLevel >= amount) {
+    protected void consumeBattery(final double amount) throws NotEnoughBatteryException {
+        if (this.getRoundedBatteryValue() >= amount) {
             this.batteryLevel -= amount;
         } else {
-            this.batteryLevel = BATTERY_EMPTY;
+        	// I don't set the battery to zero because the battery is not flat,
+        	// it just doesn't have enough charge to perform this operation!
+            throw new NotEnoughBatteryException(this.getRoundedBatteryValue());
         }
-    }
-
-    /**
-     * 
-     * @return A boolean indicating if the robot has enough energy to move
-     */
-    protected boolean isBatteryEnoughToMove() {
-        return this.getBatteryLevel() >= Robot.MOVEMENT_DELTA_CONSUMPTION;
     }
 
     /**
